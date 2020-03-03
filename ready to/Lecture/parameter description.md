@@ -1,11 +1,57 @@
-- 각 layer 별 역할 개념 및 파라미터 파악
-- tf.keras.layers.Conv2D(filters, kernel_size, strides, activation)
-- 
-  - filters : 필터의 개수를 지정
-  - kernel_size : convolution filter의 사이즈를 지정
-  - strides : 필터를 순회하는 간격을 의미
-  - padding : convolutional layer에서  filter, stride 적용으로 feature map의 크기는 입력데이터보다 작아진다. 이 때 출력데이터가 줄어드는 것을 방지하는 방법, 일반적으로 0으로 채워넣음
-  - activation : activation function을 지정
-  - pooling : convolutional의 출력 데이터를 입력으로 받아 출력 데이터의 크기를 줄이거나 특정 데이터를 강조하는 용도로 사용됨
-  - flatten : convolutional layer에서 추출된 피쳐들을 1차원으로 변경시킴
+## TensorFlow 사용법
+
+Tensor 생성
+
+- Tf.constant()
+  - List > tensor
+  - tuple > tensor
+  - array > tensor
+
+```python
+import tensorflow as tf
+import numpy as np
+
+tf.constant([1,2,3])
+tf.constant(((1,2,3),(4,5,6))
+arr = np.array([1,2,3])
+tensor = tf.constant(arr) # np.array > tf
+```
+
+tensor 정보 확인
+
+```py
+# shape
+tensor.shape
+# data type
+tensor = tf.constant([1, 2, 3], dtype=tf.float32)
+tf.cast(tensor, dtype=tf.uint8)
+```
+
+Tensor에서  numpy 사용
+
+```py
+# .numpy()
+tensor.numpy
+# np.arry()
+np.array(tensor)
+```
+
+ 난수 생성
+
+```py
+# normal distribution: 연속적인 모양, uniform distribution: 불연속적이며 일정한 분포
+np.random.randn(5) # random한 숫자 9개 생성
+tf.random.normal([3,3]) # normal
+tf.random.uniform([3,3]) # uniform
+```
+
+데이터 차원수 늘리기
+
+```py
+# numpy
+np.expand_dims(train_x, -1)
+# tensorflow
+tf.expand_dims(train_x, -1)
+train_x[..., tf.newaxis].shape
+```
 
