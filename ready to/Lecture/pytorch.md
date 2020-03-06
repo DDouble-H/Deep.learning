@@ -63,9 +63,8 @@
       print((x ** 2).requires_grad)
   ```
 
-torch.cat : 두 텐서를 이어붙임(concatenate), 데이터 복사
-
-torch.unsqueeze : 데이터 참조
+- torch.cat : 두 텐서를 이어붙임(concatenate), 데이터 복사
+- torch.unsqueeze : 데이터 참조
 
 ## pytorch data preprocess
 
@@ -99,4 +98,29 @@ test_loader = torch.utils.data.DataLoader(
     shuffle=True)
 ```
 
-pytorch는 (# batch_size, channel, height, width)
+- pytorch는 (# batch_size, channel, height, width)
+
+- Convolution
+
+  - in_channels : 받게 될 채널의 수
+  - out_channels : 보낼 채널의 수
+  - kernel_size : 만들 kernel(weight)의 사이즈
+
+- ```py
+  import torch
+  import torch.nn as nn
+  import torch.nn.functional as F
+  
+  nn.Conv2d(in_channels=1, out_channels=20, kernel_size=5, stride=1)
+  ```
+
+- weight를 numpy화
+
+- ```py
+  import torch
+  import torch.nn as nn
+  import torch.nn.functional as F
+  
+  nn.Conv2d(in_channels=1, out_channels=20, kernel_size=5, stride=1)
+  ```
+
