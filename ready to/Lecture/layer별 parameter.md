@@ -75,4 +75,54 @@ tf.keras.layers.Conv2D(filters=3, kernel_size=3, strides=1, padding='same', acti
   model = tf.keras.Model(inputs=inputs, outputs=model, name='basic_cnn')
   ```
 
-  
+
+##### Optimization
+
+- Loss function : loss를 통해 정답라벨과 비교해 얼마나 틀렸는지 확인할 수 있으며, 학습을 통해 loss를 최대한 줄이는 것이 목표
+
+  - binary : 분류하고자 하는  class가 2개일 때
+  - categorical :  분류하고자 하는 class가 2개 이상일 때
+
+  ```py
+  tf.keras.losses.sparse_categorical_crossentropy
+  tf.keras.losses.categorical_crossentropy
+  tf.keras.losses.binary_crossentropy
+  ```
+
+- Optimization : 학습을 통해 얻은 loss값을 최소화하기 위해 최적화된 값들을 반환하고 반환된 값이 적용하며 점차 모델의 성능을 높이는 방식으로 진행되며,  이때 최적화된 값만큼 즉각적으로 변화가 있는 것이 아니라 learning rate만큼 변한 값이 적용 됨
+
+  - sgd, rmsprop, adam
+
+  ```py
+  tf.keras.optimizers.SGD()
+  tf.keras.optimizers.RMSprop()
+  tf.keras.optimizers.Adam()
+  ```
+
+- Metrics : 모델을 평가하는 방법
+
+  ```python
+  tf.keras.metrics.Accuracy()
+  tf.keras.metrics.Precision()
+  tf.keras.metrics.Recall()
+  ```
+
+##### compile
+
+```py
+model.compile(optimizer=tf.keras.optimizers.Adam(),
+              loss ='sparse_categorical_crossentropy',
+              metrics = [tf.keras.metrics.Accuracy()])
+```
+
+##### train
+
+- hyperparameter 설정
+  - epochs, batch_size
+
+```py
+model.fit(x_train, y_train, 
+          batch_size=32, 
+          shuffle=True, 
+          epochs=50) 
+```
