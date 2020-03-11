@@ -126,3 +126,96 @@ model.fit(x_train, y_train,
           shuffle=True, 
           epochs=50) 
 ```
+
+##### expert
+
+- tf.data
+
+  ```py
+  train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+  train_data = train_data.shuffle(1000)
+  train_data = train_data.batch(32)
+  
+  test_data = tf.data.Dataset.from_tensor_slices((x_test, y_test))
+  test_data = test_data.batch(32)
+  ```
+
+- training
+
+  - Keras로 학습할 때는 기존 방식과 동일하나 train_data는 generator로 그대로 training 할 수 있음
+
+  ```py
+  model.compile(optimizer='adam', loss='sparse_categorical_crossentropy')
+  model.fit(train_data, epochs=50)
+  ```
+
+- optimization
+
+  - loss function
+  - optimizer
+
+  ```py
+  loss_obj = tf.keras.losses.SparseCategoricalCrossentropy()
+  optimizer = tf.keras.optimizers.Adam()
+  ```
+
+- metrics
+
+  ```py
+  train_loss = tf.keras.metrics.Mean(name='train_loss')
+  train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
+  
+  test_loss = tf.keras.metrics.Mean(name='test_loss')
+  test_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='test_accuracy')
+  ```
+
+- train
+
+  - @tf.function - 그래프 모드에서 동작, 학습이 시작되면 돌아감
+
+  ```py
+  @tf.function
+  def train_step(images, labels):
+      with tf.GradientTape() as tape:
+          predictions = model(images)
+          loss = loss_obj(labels, predictions)
+      gradients = tape.gradient(loss, model.trainable_variables)
+      optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+      
+      train_loss(loss)
+      train_accuracy(labels, predictions)
+      
+  @tf.function
+  def test_step(images, labels):
+      predictions = model(images)
+      t_loss = loss_obj(labels, predictions)
+      
+      test_loss(t_loss)
+      test_accuracy(labels, predictions)
+  ```
+
+      for test_images, test_labels in test_ds:
+          test_step(test_images, test_labels)
+      
+      template = 'Epoch {}, Loss: {}, Accuracy: {}, Test Loss {}, Test Accuracy: {}'
+      print(template.format(epoch+1, 
+                            train_loss.result(),
+                            train_accuracy.result() * 100, 
+                            test_loss.result(), 
+                            test_accuracy.result() * 100)) 
+
+##### Evaluating
+
+- 학습한 모델 확인
+
+  ```py
+  model.evaluate(x_test, y_test, batch_size=batch_size)
+  ```
+
+##### Predicting
+
+- 예측
+
+  ```py
+  pred = model.predict(test_image)
+  ```
