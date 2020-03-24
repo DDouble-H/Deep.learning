@@ -81,3 +81,72 @@ glob('os.listdir('./dataset/img/*.png) # 해당경로에서 확장자가 .png인
       horizontal_flip=True)
   ```
 
+- data preprocess
+
+  ```py
+  train_path = glob(./dataset/cifar/train/*.png)
+  test_path = glob(./dataset/cifar/test/*.png)
+  
+  path = train_path[0]
+  
+  def get_class_name(path):
+      return path.split('_')[-1].replace('.png', '')
+      
+  train_label = [get_class_name(path) for path in train_path]
+  
+  class_name = np.unique(train_label)
+  
+  def get_label(path):
+      fname = tf.strings.split(path, '_')[-1]
+      label_name = tf.strings.regex_replace(fname, '.png', '')
+      onehot = tf.cast(label_name == class_names, tf.uint8)
+      return onehot
+      
+  def load_image_label(path):
+  	  # read image
+      gfile = tf.io.read_file(path)
+      image = tf.io.decode_image(gfile)
+      image = tf.cast(image, tf.float32) / 255.  # rescale
+      
+      # read label
+      label = get_label(path)
+      return image, label
+  
+  image, label = load_image_label(path)
+  
+  def image_preprocess(image, label):
+      image = tf.image.random_flip_up_down(image)
+      image = tf.image.random_flip_left_right(image)
+      return image, label
+      
+  AUTOTUNE = tf.data.experimental.AUTOTUNE
+  
+  # train_dataset
+  train_dataset = tf.data.Dataset.from_tensor_slices(train_path)
+  train_dataset = train_dataset.map(load_image_label, num_parallel_calls=AUTOTUNE)
+  train_dataset = train_dataset.map(image_preprocess, num_parallel_calls=AUTOTUNE)
+  train_dataset = train_dataset.batch(batch_size)
+  train_dataset = train_dataset.shuffle(buffer_size=len(train_path))
+  train_dataset = train_dataset.repeat()
+  
+  # test_dataset
+  test_dataset = tf.data.Dataset.from_tensor_slices(test_paths)
+  test_dataset = test_dataset.map(load_image_label, num_parallel_calls=AUTOTUNE)
+  test_dataset = test_dataset.batch(batch_size)
+  test_dataset = test_dataset.repeat()
+  ```
+
+- training
+
+  ```py
+  steps_per_epoch = len(train_path) // batch_size
+  validation_steps = len(test_path) // batch_size
+  
+  model.fit_generator(
+      train_dataset,
+      steps_per_epoch=steps_per_epoch,
+      validation_data=test_dataset,
+      validation_steps=validation_steps,
+      epochs=num_epochs
+  )
+  ```
