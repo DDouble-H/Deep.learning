@@ -150,3 +150,25 @@ glob('os.listdir('./dataset/img/*.png) # 해당경로에서 확장자가 .png인
       epochs=num_epochs
   )
   ```
+
+- Callbacks
+
+  ```py
+  logdir = os.path.join('logs',  datetime.now().strftime("%Y%m%d-%H%M%S"))
+  
+  tensorboard = tf.keras.callbacks.TensorBoard(
+      log_dir=logdir, 
+      write_graph=True, 
+      write_images=True,
+      histogram_freq=1
+  )
+  ```
+
+- Checkpoint
+
+  ```py
+  checkpoint = tf.keras.callbacks.ModelCheckpoint(save_path, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
+  ```
+
+  
+
