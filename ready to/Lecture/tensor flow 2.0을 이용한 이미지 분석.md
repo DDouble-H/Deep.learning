@@ -167,7 +167,22 @@ glob('os.listdir('./dataset/img/*.png) # 해당경로에서 확장자가 .png인
 - Checkpoint
 
   ```py
-  checkpoint = tf.keras.callbacks.ModelCheckpoint(save_path, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
+  checkpoint = tf.keras.callbacks.ModelCheckpoint(save_path, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max') 
+  # save_best_only acc가 올라가면 저장, 아니면 저장하지 않음
+  # monitor='loss'> mode ='min'
+  
+  ```
+
+- Learning Rate Scheduler
+
+  ```py
+  def scheduler(epoch): # 에폭마다 러닝레이트를 변경함
+      if epoch < 10 :
+          return 0.001
+      else:
+          return 0.001 * math.exp(0.1 * (10-epoch))
+          
+  learning_rate_scheduler = tf.keras.callbacks.LearningRateScheduler(scheduler)
   ```
 
   
