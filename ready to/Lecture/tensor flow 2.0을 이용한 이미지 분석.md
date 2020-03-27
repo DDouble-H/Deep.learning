@@ -170,7 +170,6 @@ glob('os.listdir('./dataset/img/*.png) # 해당경로에서 확장자가 .png인
   checkpoint = tf.keras.callbacks.ModelCheckpoint(save_path, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max') 
   # save_best_only acc가 올라가면 저장, 아니면 저장하지 않음
   # monitor='loss'> mode ='min'
-  
   ```
 
 - Learning Rate Scheduler
@@ -183,6 +182,34 @@ glob('os.listdir('./dataset/img/*.png) # 해당경로에서 확장자가 .png인
           return 0.001 * math.exp(0.1 * (10-epoch))
           
   learning_rate_scheduler = tf.keras.callbacks.LearningRateScheduler(scheduler)
+  ```
+
+- 이미지 load
+
+  ```py
+  path = train_paths[0]
+  test_image, test_label = load_image_label(path)
+  test_image = test_image[tf.newaxis, ...]
+  pred = model.predict(test_image)
+  ```
+
+- generator 이용해 데이터 가져오는 방법
+
+  ```py
+  test_image, test_label = next(iter(test_dataset))
+  pred = model.predict(test_image)
+  pred[0]
+  # generator에 넣는 방법
+  pred = model.predict_generator(test_dataset.take(1))
+  pred = model.predict_generator(test_dataset.take(2))
+  ```
+
+- save model
+
+  ```py
+  save_path = 'model./h5'
+  model.save(save_path, include_optimizer=True)
+  model = tf.keras.models.load_model('model.h5')
   ```
 
   
