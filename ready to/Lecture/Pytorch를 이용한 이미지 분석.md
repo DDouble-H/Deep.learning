@@ -55,13 +55,13 @@
   device = torch.device("cuda" if use_cuda else "cpu")
   
   
-  train_dataset = datasets.ImageFolder(root=train_dir,
+  train_dataset = datasets.ImageFolder(root=train_path,
                              transform=transforms.Compose([
                                  transforms.ToTensor(),
                                  transforms.Normalize((0.1307,), (0.3081,))
                              ]))
   
-  test_dataset = datasets.ImageFolder(root=test_dir,
+  test_dataset = datasets.ImageFolder(root=test_path,
                              transform=transforms.Compose([
                                  transforms.ToTensor(),
                                  transforms.Normalize((0.1307,), (0.3081,))
@@ -82,3 +82,67 @@
   model = Net().to(device)
   optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum)
   ```
+
+- Custom dataset
+
+  ```py
+  class FaceLandmarksDataset(Dataset):
+  
+      def __init__(self, data_path, transform=None):
+          self.data_path = data_path
+          self.transform = transform
+  
+      def __len__(self):
+          return len(self.data_path)
+  
+      def __getitem__(self, idx):
+          path = self.data_path[idx]
+          # read image
+          image = Image.open(path).convert("L")
+          # get label
+          label = int(path.split('\\')[-2])
+          
+          if self.transform:
+              sample = self.transform(sample)
+  
+          return image, label
+  ```
+
+  ```py
+  torch.manual_seed(seed)
+  
+  use_cuda = not no_cuda and torch.cuda.is_available()
+  device = torch.device("cuda" if use_cuda else "cpu")
+  
+  kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
+  
+  train_loader = torch.utils.data.DataLoader(
+      Dataset(train_path, 
+              transforms.Compose([
+                  transforms.RandomHorizontalFlip(), 
+                  transforms.ToTensor(), 
+                  transforms.Normalize(
+                      mean=[0.406],
+                      std=[0.225])])
+             ),
+      batch_size=batch_size, 
+      shuffle=True, 
+      **kwargs
+  )
+  
+  test_loader = torch.utils.data.DataLoader(
+      Dataset(test_path, 
+              transforms.Compose([ 
+                  transforms.ToTensor(), 
+                  transforms.Normalize(
+                       mean=[0.406],
+                      std=[0.225])])
+             ),
+      batch_size=batch_size, 
+      shuffle=False, 
+      **kwargs
+  )
+  ```
+
+  
+
