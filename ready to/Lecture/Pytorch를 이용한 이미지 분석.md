@@ -144,5 +144,47 @@
   )
   ```
 
-  
 
+- torchvision
+
+  ```py
+  from PIL import Image
+  import numpy as np
+  import torchvision
+  
+  path = 'test.jpg'
+  image = Image.open(path)
+  
+  torchvision.transforms.CenterCrop(size=(300, 300))(image)
+  torchvision.transforms.ColorJitter(brightness=1, contrast=0, saturation=0, hue=0)(image)
+  torchvision.transforms.FiveCrop(size=(300, 300))(image)[3] # 5개로 크롭
+  torchvision.transforms.Grayscale(num_output_channels=1)(image)
+  torchvision.transforms.RandomAffine(degrees=90, translate=None, scale=None, shear=None, resample=False, fillcolor=0)(image) # fillcolor=빈 공간 채울 색
+  
+  
+  transforms = [torchvision.transforms.Grayscale(num_output_channels=1),
+                torchvision.transforms.CenterCrop(size=(600, 600)),
+                torchvision.transforms.RandomAffine(degrees=90, translate=None, scale=None, shear=None, resample=False, fillcolor=0)]
+                
+  torchvision.transforms.RandomApply(transforms, p=0.5)(image) # p=확률
+  torchvision.transforms.RandomChoice(transforms)(image)
+  torchvision.transforms.RandomCrop(size=(600, 600), padding=None, pad_if_needed=False, fill=0, padding_mode='constant')(image)
+  torchvision.transforms.RandomHorizontalFlip(p=0.7)(image)
+  ```
+
+- transform on Tensor
+
+  ```py
+  # normalization
+  tensor_image = torchvision.transforms.ToTensor()(image) # totensor
+  transform_image = torchvision.transforms.Normalize(mean=(0,0,0), std=(1,1,1), inplace=False)(tensor_image) # mean=dimension기준
+  
+  transform_image = transform_image.numpy()
+  
+  print('Min:', np.min(transform_image_image), 
+        ', Max:', np.max(transform_image_image), 
+        ', Mean:', np.mean(transform_image_image), 
+        ', Std:', np.std(transform_image_image))
+        
+  transform_image = torchvision.transforms.RandomErasing(p=0.5, scale=(0.02, 0.33), ratio=(0.3, 3.3), value=0, inplace=False)(tensor_image)
+  ```
