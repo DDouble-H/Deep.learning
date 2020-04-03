@@ -188,3 +188,69 @@
         
   transform_image = torchvision.transforms.RandomErasing(p=0.5, scale=(0.02, 0.33), ratio=(0.3, 3.3), value=0, inplace=False)(tensor_image)
   ```
+
+- Learning Rate Scheduler
+
+  ```py
+  from torch.optim.lr_scheduler import ReduceLROnPlateau
+  scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.1, patience=0, verbose=True)
+  ```
+
+- Training
+
+  ```py
+  import torchvision
+  from torch.utils.tensorboard import SummaryWriter
+  
+  writer = SummaryWriter() # log_dir 지정하지 않아도 생성, 지정가능
+  
+  for epoch in range(1, epochs + 1):
+      # Train Mode
+      model.train()
+  
+      for batch_idx, (data, target) in enumerate(train_loader):
+          data, target = data.to(device), target.to(device)
+  
+          optimizer.zero_grad()
+          output = model(data)
+          loss = F.nll_loss(output, target)  # https://pytorch.org/docs/stable/nn.html#nll-loss
+          loss.backward()
+          optimizer.step()
+  
+          if batch_idx % log_interval == 0:
+              print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                  epoch, batch_idx * len(data), len(train_loader.dataset),
+                  100. * batch_idx / len(train_loader), loss.item()))
+      
+      # Test mode
+      model.eval()
+      test_loss = 0
+      correct = 0
+      with torch.no_grad():
+          for data, target in test_loader:
+              data, target = data.to(device), target.to(device)
+              output = model(data)
+              test_loss += F.nll_loss(output, target, reduction='sum').item() # sum up batch loss
+              pred = output.argmax(dim=1, keepdim=True) # get the index of the max log-probability
+              correct += pred.eq(target.view_as(pred)).sum().item()
+  
+      test_loss /= len(test_loader.dataset)
+      
+      accuracy = 100. * correct / len(test_loader.dataset)
+      
+      scheduler.step(accuracy, epoch) # Learning rate scheduler
+      
+      print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+          test_loss, correct, len(test_loader.dataset),
+          accuracy))
+      
+      if epoch == 0:
+          grid = torchvision.utils.make_grid(data)
+          writer.add_image('images', grid, epoch)
+          writer.add_graph(model, data)
+      
+      writer.add_scalar('Loss/train/', loss, epoch)
+      writer.add_scalar('Loww/test/', test_loss, epoch)
+      writer.add_scalar('Accuracy/test/', accuracy, epoch)
+  writer.close()
+  ```
