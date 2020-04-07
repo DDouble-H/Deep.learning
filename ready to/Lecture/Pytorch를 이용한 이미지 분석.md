@@ -254,3 +254,41 @@
       writer.add_scalar('Accuracy/test/', accuracy, epoch)
   writer.close()
   ```
+
+- save model
+
+  ```py
+  # weight만 저장 : 다른 모델에 적용, 모델 수정 등 용이
+  save_path = './model/model_weight.pt'
+  torch.save(model.state_dict(), save_path)
+  
+  model = Net().to(device) # load a model
+  weight_dict = torch.load(save_path)
+  
+  model.load_state_dict(weight_dict) # load a model, weight
+  model.eval()
+  
+  # 전체모델 저장
+  save_path = './model/model.pt'
+  torch.save(model, save_path)
+  model = torch.load(save_path)
+  model.eval()
+  
+  #
+  checkpoint_path = 'checkpoint.pt'
+  torch.save({
+              'epoch': epoch,
+              'model_state_dict': model.state_dict(),
+              'optimizer_state_dict': optimizer.state_dict(),
+              'loss': loss
+              }, checkpoint_path)
+  model = Net().to(device)
+  optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum)
+  
+  checkpoint = torch.load(checkpoint_path)
+  model.load_state_dict(checkpoint['model_state_dict'])
+  optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+  epoch = checkpoint['epoch']
+  loss = checkpoint['loss']
+  model.train()
+  ```
