@@ -191,3 +191,22 @@
   - 학습과정에서 배치별로 평균과 분산을 이용해 정규화하는 계층을 배치 정규화 계층이라고 함
   - 학습단계에서 정규화로 인해, 모든 계층의 특징이 동일한 scale이 되어 학습률 결저에 유리하며 추가적인 scale, bias를 학습해 activation에 적합한 분포로 변환할 수 있음
   - 추론단계에서는 평균과 분산을 이동평균(지수평균)을 구하여 고정하며 정규화와 추가 scale, bias를 결합하여 단일 곱, 더하기 연산으로 줄일 수 있음
+- GoogLeNet(Inception)
+  - inception module
+    - 다양한 크기의 합성곱 계층을 한 번에 계산하는 모듈
+    - 연산량을 줄이기 위한 1x1 합성곱 계층을 적용, bottleneck 구조
+    - Bottleneck구조 활용으로 receptive filed를 유지하면서 파라미터의 수와 연산량 감소하는 효과
+    - 역전파에서 vanishing gradient 문제 발생을 방지하기 위해 추가 분류기 적용
+- Residual Network (ResNet)
+  - Skip-connection
+    - feature를 추출하기 전 후를 더하는 특징이 있음
+    - 기존에는 한 단위의 특징 맵을 추출하고 난 후에 활성함수를 적용했으나 개선된 구조에서는 identity mapping을 얻기 위해서 pre-activation을 제안
+  - Pre-activation
+    - Conv-BN-ReLU 구조를 BN-ReLU-Conv 구조로 변경 후 성능 개선
+    - BN-ReLU-Conv의 경우 gradient highway가 형성되어 극적인 효과가 나타남
+- Densely Connected ConvNets(DenseNet)
+  - ResNet의 아이디어를 개선한 구조
+  - Dense Block을 제안하며, Dense Block은 ResNet과 같이 Pre-Activaton 구조를 사용
+  - Dense Block
+    - 연결된 skip connection이 복잡해 보일 수 있으나 이전 특징 맵에 누적해 concatenate하는 결과와 같음
+    - 연산량이 증가되는 것을 방지하기 위해 1x1 Conv를 이용한 Bottleneck 구조를 사용함
